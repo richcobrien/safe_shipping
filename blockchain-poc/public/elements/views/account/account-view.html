@@ -1,252 +1,116 @@
-<!-- import polymer -->
-<link rel="import" href="../../bower_components/px-sample-cards/blank-card.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/polymer/polymer.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/px-sample-cards/blank-card.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/iron-ajax/iron-ajax.html">
 
-<!-- px components -->
-<link rel="import" href="../../bower_components/px-app-nav/px-app-nav.html">
-<link rel="import" href="../../bower_components/px-view/px-view.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/iron-icon/iron-icon.html">"
 
-<!-- app route -->
-<link rel="import" href="../../bower_components/app-route/app-location.html">
-<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="/blockchain-pocv/bower_components/px-table-view/px-table-row.html" />
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/px-table-row-action-button.html" />
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/px-table-row-swipe-behavior.html" />
 
-<!-- import page level css -->
-<link rel="import" href="seed-app-styles.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/px-table-view-icon.html" />
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/px-table-view-sortable-list.html" />
 
-<!-- import page level default elements -->
-<link rel="import" href="../ge-svg-logo/ge-svg-logo.html">
-<link rel="import" href="../predix-logo/predix-logo.html">
-<link rel="import" href="../seed-footer/seed-footer.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/css/px-table-view-styles.html">
+<link rel="import" href="/blockchain-poc/public/bower_components/px-table-view/css/px-table-row-styles.html">
 
-<dom-module id="seed-app">
+<dom-module id="account-view">
     <template>
 
-    <!-- apply imported seed app style module -->
-    <style include="seed-app-styles"></style>
+    <blank-card id="myCard">
 
-    <header role="banner" class="flex flex--middle">
-      <div class="viewport flex">
-        <h3 class="flex__item app-title"><ge-svg-logo class="u-mr--"></ge-svg-logo> SmartTransport</h3>
-        <div class="flex__item">
-          <div class="flex" style="text-align:right;">
-            <h3 class="flex__item weight--normal logo">Powered by <predix-logo style="display:inline-block; width: 82px;" class="flex__item"></predix-logo></h3>
-          </div>
-        </div>
-      </div>
-    </header>
+      <select id="selectRowTemplate" items="{{participants}}" is="dom-repeat">
+        <option value="{{items.title}}">{{items.title}}</option>
+      </select>
 
-    <div class="viewport">
+      <h3>Account Name: <span><strong>{{user.fullname}}</strong></span></h3>
+      <h3>Role: <span><strong>Consumer</strong></span></h3>
+      <button on-tap="saveChanges">Save Changes</button>
 
-      <div class="content-wrapper">
-        <px-app-nav style="min-height:100%!important;"
-          class="navbar"
-          nav-items="[[navItems]]"
-          path-prefix="[[pathPrefix]]">
-        </px-app-nav>
+    </blank-card>
 
-        <main class="u-pt-- u-pr-- u-pl--" role="main">
+    <!-- IronAjax used to load participants data from local json file. Later to use service URL -->
+    <iron-ajax
+      id="participantsIronAjax"
+      url="/server/sample-data/persistantTable.json"
+      last-response="{{_decksResponse}}">
 
-          <!-- app-location captures url and assigns _route value -->
-          <app-location
-            id="carbonLocation"
-            route="{{_route}}"
-            use-hash-as-path>
-          </app-location>
-
-          <!-- /Account route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/account"
-            active="{{_accountActive}}">
-          </app-route>
-          <px-view
-            active="[[_accountActive]]"
-            element-href="/elements/views/account/account-view.html">
-          </px-view>
-
-          <!-- /Exchange route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/exchange"
-            active="{{_exchangeActive}}">
-          </app-route>
-          <px-view
-            active="[[_exchangeActive]]"
-            element-href="/elements/views/exchange/exchange-view.html">
-          </px-view>
-
-           <!-- /Contract route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/contract"
-            active="{{_contractActive}}">
-          </app-route>
-          <px-view
-            active="[[_contractActive]]"
-            element-href="/elements/views/contract/contract-view.html">
-          </px-view>
-
-          <!-- /Timeline route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/timeline"
-            active="{{_timelineActive}}">
-          </app-route>
-          <px-view
-            active="[[_timelineActive]]"
-            element-href="/elements/views/timeline/timeline-view.html">
-          </px-view>
-
-          <!-- /Transit Map route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/transit"
-            active="{{_transitActive}}">
-          </app-route>
-          <px-view
-            active="[[_transitActive]]"
-            element-href="/elements/views/transit/transit-view.html">
-          </px-view>
-
-           <!-- /History route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/history"
-            active="{{_historyActive}}">
-          </app-route>
-          <px-view
-            active="[[_historyActive]]"
-            element-href="/elements/views/history/history-view.html">
-          </px-view>
-
-         <!-- /dashboards route and view>
-          <app-route
-            route="[[_route]]"
-            pattern="/dashboards"
-            active="{{_dashboardsActive}}">
-          </app-route>
-          <px-view
-            active="[[_dashboardsActive]]"
-            element-href="/elements/views/dashboards-view.html">
-          </px-view -->
-
-          <!-- /winddata route and view>
-          <app-route
-            route="[[_route]]"
-            pattern="/winddata"
-            active="{{_winddataActive}}">
-          </app-route>
-          <px-view
-            active="[[_winddataActive]]"
-            element-href="/elements/views/winddata-view.html">
-          </px-view -->
-
-        </main>
-
-      </div>
-    </div>
-
-    <seed-footer footer-links='[[footerLinks]]'></seed-footer>
+      <!--
+        // original
+        auto
+        url="[[_decksUrl]]""
+      -->
+    </iron-ajax>
 
   </template>
     <script>
         Polymer({
-            is: 'seed-app',
-
+            is: 'account-view',
             properties: {
-
-                routesActive: {
-                    type: Boolean,
-                    value: false
+                ready: function() {
+                    //console.log('blankpage-view ready()');
+                    //getCurrentTime();
                 },
-
-                //Global application object
-                global: {
+                user: {
                     type: Object,
+                    first: String,
+                    last: String,
+                    fullname: String,
                     value: function() {
                         return {
-                            version: '1.0',
-                            name: 'Predix UI Seed',
-                            session: {}
-                        }
+                            first: 'John',
+                            last: 'Smith',
+                            fullname: 'John Smith'
+                        };
                     }
                 },
-
-                navItems: {
+                participants: {
                     type: Array,
-                    value: function() {
-                        return [{
-                            "label": "Account",
-                            "path": "/account",
-                            "icon": "fa-users"
-                        }, {
-                            "label": "Exchange",
-                            "path": "/exchange",
-                            "icon": "fa-exchange"
-                        }, {
-                            "label": "Contract",
-                            "path": "/contract",
-                            "icon": "fa-file-text-o"
-                        }, {
-                            "label": "Timeline",
-                            "path": "/timeline",
-                            "icon": "fa-clock-o"
-                        }, {
-                            "label": "Transit",
-                            "path": "/transit",
-                            "icon": "fa-map"
-                        }, {
-                            "label": "History",
-                            "path": "/history",
-                            "icon": "fa-list"
-                        }]
-                    }
+                    value: [{
+                        "title": "SFO > NYC",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-file-text-o"
+                    }, {
+                        "title": "SFO > MIA",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-list-alt"
+                    }, {
+                        "title": "SFO > DFW",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-check-square-o"
+                    }, {
+                        "title": "SFO > DCO",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-check-square-o"
+                    }, {
+                        "title": "SFO > ARZ",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-square-o"
+                    }, {
+                        "title": "SFO > ARK",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-exclamation-triangle"
+                    }, {
+                        "title": "SFO > LAX",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-exclamation-triangle"
+                    }, {
+                        "title": "SFO > SEA",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-exclamation"
+                    }, {
+                        "title": "SFO > SLC",
+                        "body": "DPT Vaccine - Requirement: < 38 Fahrenheit",
+                        "icon": "fa:fa-flag-checkered"
+                    }]
                 },
-
-                footerLinks: {
-                    type: Array,
-                    value: function() {
-                        return [{
-                            "label": "Privacy",
-                            "href": "#/account",
-                            "target": "_blank"
-                        }, {
-                            "label": "Terms",
-                            "href": "#/account",
-                            "target": "_blank"
-                        }, {
-                            "label": "Contact",
-                            "href": "#/account",
-                            "target": "_blank"
-                        }, {
-                            "label": "Accessibility",
-                            "href": "#/account",
-                            "target": "_blank"
-                        }, {
-                            "label": "Cookies",
-                            "href": "#/account",
-                            "target": "_blank"
-                        }]
-                    }
-                },
-
-                // Sets app default base URL for client-side routing
-                pathPrefix: {
-                    type: String,
-                    value: '#'
-                }
+            },
+            saveChanges: function() {
+                // Display confirmation
+                this.set('user.manager', 'Jimmy');
             },
 
-            ready: function() {
-                this._checkForDefaultRoute();
-            },
 
-            _checkForDefaultRoute: function() {
-                // set default route to /dashboards
-                var l = window.location;
-                if ((l.hash === "#/" || l.hash === "") && l.pathname === "/") {
-                    l.hash = "/account";
-                }
-            }
 
         });
     </script>
