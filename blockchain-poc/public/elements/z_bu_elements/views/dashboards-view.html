@@ -1,15 +1,15 @@
 <link rel="import" href="../../bower_components/px-sample-cards/blank-card.html">
-<link rel="import" href="/bower_components/px-context-browser/px-context-browser.html">
-<link rel="import" href="/bower_components/px-deck-selector/px-deck-selector.html">
-<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/px-context-browser/px-context-browser.html">
+<link rel="import" href="../../bower_components/px-deck-selector/px-deck-selector.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <!-- local px-deck -->
 <link rel="import" href="../../elements/px-deck/px-deck-index.html">
 
 <dom-module id="dashboards-view">
-  <template>
+    <template>
 
-    <script type="text/javascript" src="/bower_components/es6-promise/es6-promise.min.js"></script>
+    <script type="text/javascript" src="../../bower_components/es6-promise/es6-promise.min.js"></script>
 
     <!-- contextIronAjax used to load data from local Predix Asset API -->
     <iron-ajax
@@ -45,121 +45,122 @@
     </px-deck-index>
 
   </template>
-  <script>
-    Polymer({
+    <script>
+        Polymer({
+            is: 'dashboards-view',
+            properties: {
+                _decks: {
+                    type: Array,
+                    computed: '_computeDecks(_decksResponse)'
+                },
+                _initialBrowserContext: {
+                    type: Object,
+                    computed: '_computeInitialBrowserContext(_browserContext)'
+                },
+                _nodeUri: {
+                    type: String
+                },
+                _decksUrl: {
+                    type: String,
+                    computed: '_computeDecksUrl(_selectedContextTag, viewServiceBaseUrl)'
+                },
+                _selectedContextTag: {
+                    type: String,
+                    value: ''
+                },
+                viewServiceBaseUrl: {
+                    type: String,
+                    value: '/api/view-service/'
+                },
+                _selectedDeckId: {
+                    type: String,
+                    computed: '_computeSelectedDeckId(_selectedDeck)'
+                }
+            },
 
-      is: 'dashboards-view',
+            _computeDecksUrl: function() {
+                if (this._selectedContextTag) {
+                    return this.viewServiceBaseUrl + "decks?tag=" + this._selectedContextTag;
+                } else {
+                    return this.viewServiceBaseUrl + "decks";
+                }
+            },
 
-      properties: {
-        _decks: {
-          type: Array,
-          computed: '_computeDecks(_decksResponse)'
-        },
-        _initialBrowserContext: {
-          type: Object,
-          computed: '_computeInitialBrowserContext(_browserContext)'
-        },
-        _nodeUri: {
-          type: String
-        },
-        _decksUrl: {
-          type: String,
-          computed: '_computeDecksUrl(_selectedContextTag, viewServiceBaseUrl)'
-        },
-        _selectedContextTag: {
-          type: String,
-          value: ''
-        },
-        viewServiceBaseUrl: {
-          type: String,
-          value: '/api/view-service/'
-        },
-        _selectedDeckId: {
-          type: String,
-          computed: '_computeSelectedDeckId(_selectedDeck)'
-        }
-      },
+            _computeSelectedDeckId: function() {
+                if (this._selectedDeck) {
+                    return this._selectedDeck.id;
+                }
+            },
 
-      _computeDecksUrl: function() {
-        if(this._selectedContextTag) {
-          return this.viewServiceBaseUrl + "decks?tag=" + this._selectedContextTag;
-        } else {
-          return this.viewServiceBaseUrl + "decks";
-        }
-      },
+            ready: function ready() {
+                var _this = this;
+                this.$.contextBrowser.handlers = {
+                    // getChildren fires when a node is 'selected'
+                    getChildren: function(parent, newIndex) {
+                        return _this._getChildren(parent);
+                    },
+                    // itemOpenHandler fires when a node's 'open' link is clicked
+                    itemOpenHandler: function(item) {
+                        return _this._itemOpenHandler(item);
+                    }
+                };
+                // initialize context data and decks
+                this.$.contextIronAjax.generateRequest();
+                this.$.decksIronAjax.generateRequest();
+            },
 
-      _computeSelectedDeckId: function() {
-        if(this._selectedDeck) {
-          return this._selectedDeck.id;
-        }
-      },
+            _computeDecks: function() {
+                var decks = [];
+                if (this._decksResponse && this._decksResponse.length > 0) {
+                    this._decksResponse.forEach(function(deck) {
+                        decks.push({
+                            name: deck.title,
+                            id: deck.id
+                        });
+                    });
+                };
+                return decks;
+            },
 
-      ready: function ready() {
-        var _this = this;
-        this.$.contextBrowser.handlers = {
-          // getChildren fires when a node is 'selected'
-          getChildren: function(parent, newIndex) {
-            return _this._getChildren(parent);
-          },
-          // itemOpenHandler fires when a node's 'open' link is clicked
-          itemOpenHandler: function(item) {
-            return _this._itemOpenHandler(item);
-          }
-        };
-        // initialize context data and decks
-        this.$.contextIronAjax.generateRequest();
-        this.$.decksIronAjax.generateRequest();
-      },
+            _computeInitialBrowserContext: function(_browserContext) {
+                if (typeof this._initialBrowserContext !== 'object') {
+                    return _browserContext;
+                } else {
+                    return this._initialBrowserContext;
+                }
+            },
 
-      _computeDecks: function() {
-        var decks = [];
-        if (this._decksResponse && this._decksResponse.length > 0) {
-          this._decksResponse.forEach(function(deck) {
-            decks.push({ name: deck.title, id: deck.id });
-          });
-        };
-        return decks;
-      },
+            // "getChildren" handler for px-context-browser
+            // this function is passed into
+            _getChildren: function(node) {
+                var that = this;
+                return new Promise(function(resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open('GET', '/api/predix-asset' + node.uri);
 
-      _computeInitialBrowserContext: function(_browserContext) {
-        if(typeof this._initialBrowserContext !== 'object') {
-          return _browserContext;
-        } else {
-          return this._initialBrowserContext;
-        }
-      },
+                    req.onload = function() {
+                        if (req.status === 200) {
+                            that._nodeUri = node.uri;
+                            // that._computeDecks();
+                            resolve(JSON.parse(req.response));
+                        } else {
+                            reject(req.statusText);
+                        }
+                    };
 
-      // "getChildren" handler for px-context-browser
-      // this function is passed into
-      _getChildren: function(node) {
-        var that = this;
-        return new Promise(function(resolve, reject) {
-          var req = new XMLHttpRequest();
-          req.open('GET', '/api/predix-asset' + node.uri);
+                    req.onError = function() {
+                        reject("Network Error");
+                    };
 
-          req.onload = function() {
-            if (req.status === 200) {
-              that._nodeUri = node.uri;
-              // that._computeDecks();
-              resolve(JSON.parse(req.response));
-            } else {
-              reject(req.statusText);
-            }
-          };
+                    req.send()
+                });
+            },
 
-          req.onError = function() {
-            reject("Network Error");
-          };
+            _itemOpenHandler: function(item) {
+                this._selectedContextTag = item.id;
+                this.$.decksIronAjax.generateRequest();
+            },
 
-          req.send()
         });
-      },
-
-      _itemOpenHandler: function(item) {
-        this._selectedContextTag = item.id;
-        this.$.decksIronAjax.generateRequest();
-      },
-
-    });
-  </script>
+    </script>
 </dom-module>
