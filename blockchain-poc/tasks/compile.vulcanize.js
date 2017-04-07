@@ -16,7 +16,7 @@ module.exports = function(gulp) {
                 'public/elements/views/history/history-view.html',
                 'public/elements/views/timeline/timeline-view.html',
                 'public/elements/views/transit/transit-view.html'
-            ], { base: 'public/' })
+            ], { base: 'public/elements/' })
             .pipe(vulcanize({
                 abspath: '',
                 excludes: [
@@ -30,9 +30,9 @@ module.exports = function(gulp) {
                     'public/bower_components/iron-ajax/iron-request.html'
                 ],
                 stripComments: true,
-                inlineCSS: true,
+                inlineCss: true,
                 inlineScripts: true
             }))
-            .pipe(gulp.dest('dist/public/elements/'));
+            .pipe(gulp.dest('dist/public/'));
     };
 };
