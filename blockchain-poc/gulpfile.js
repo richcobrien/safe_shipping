@@ -2,6 +2,7 @@
 const gulp = require('gulp');
 const plugins = require('gulp-load-plugins')();
 const gulpSequence = require('gulp-sequence');
+const vulcanize = require('gulp-vulcanize');
 
 var dev = process.argv.indexOf('--dist') < 0;
 
@@ -9,8 +10,28 @@ var dev = process.argv.indexOf('--dist') < 0;
 // getTask() loads external gulp task script functions by filename
 // -----------------------------------------------------------------------------
 function getTask(task) {
-	return require('./tasks/' + task)(gulp, plugins);
+    return require('./tasks/' + task)(gulp, plugins);
 }
+
+gulp.task('copy', function() {
+    return gulp.src([
+            'index.html',
+            'bower_components/webcomponents/webcomponents-lite.js'
+        ], {
+            base: 'public'
+        })
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('vulcanize', function() {
+    return gulp.src('elements/seed-app/seed-app.html')
+        .pipe(vulcanize({
+            stripComments: true,
+            inlineScripts: true,
+            inlineCss: true
+        }))
+        .pipe(gulp.dest('dist'));
+});
 
 // -----------------------------------------------------------------------------
 // Task: Compile : Scripts, Sass, EJS, All
@@ -48,6 +69,6 @@ gulp.task('dist:clean', getTask('dist.clean'));
 // -----------------------------------------------------------------------------
 //  Task: Default (compile source, start server, watch for changes)
 // -----------------------------------------------------------------------------
-gulp.task('default', function (cb) {
-	gulpSequence('compile:index', (dev ? 'serve:dev:start' : 'serve:dist:start'), 'watch:public')(cb);
+gulp.task('default', function(cb) {
+    gulpSequence(['vulcanize'], 'compile:index', (dev ? 'serve:dev:start' : 'serve:dist:start'), 'watch:public')(cb);
 });

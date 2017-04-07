@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/px-sample-cards/blank-card.html">
+<link rel="import" href="/bower_components/px-sample-cards/blank-card.html">
 <link rel="import" href="/bower_components/px-card/px-card.html">
 <link rel="import" href="/bower_components/px-vis-timeseries/px-vis-timeseries.html">
 <link rel="import" href="/bower_components/px-rangepicker/px-rangepicker.html">
@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/bower_components/px/dist/px.min.js"></script>
 
 <dom-module id="time-series-card">
-  <template>
+    <template>
     <px-card header-text="Time Series Card">
 
       <px-rangepicker
@@ -111,25 +111,25 @@
   </template>
 </dom-module>
 <script>
-Polymer({
-  is: 'time-series-card',
-  properties: {
-    config: {
-        type: Object
-    }
-  },
+    Polymer({
+        is: 'time-series-card',
+        properties: {
+            config: {
+                type: Object
+            }
+        },
 
-  ready: function(){
-    var rangepicker = this.$.rangepicker,
-        btnSnap = this.$.btnSnap,
-        timeSerie = this.$.timeSerie;
+        ready: function() {
+            var rangepicker = this.$.rangepicker,
+                btnSnap = this.$.btnSnap,
+                timeSerie = this.$.timeSerie;
 
-    rangepicker.range = {
-        "from":"2014-04-10T04:01:00.000Z",
-        "to":"2015-04-01T20:42:00.000Z"
-    };
+            rangepicker.range = {
+                "from": "2014-04-10T04:01:00.000Z",
+                "to": "2015-04-01T20:42:00.000Z"
+            };
 
-  },
+        },
 
-});
+    });
 </script>

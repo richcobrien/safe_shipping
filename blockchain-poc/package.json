@@ -31,7 +31,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-serve": "^0.1.6",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-clean": "^0.3.2",
     "gulp-cssmin": "^0.1.7",
@@ -58,7 +58,8 @@
     "postcss-cli": "^2.5.2",
     "request": "^2.58.0",
     "run-sequence": "^1.2.2",
-    "sass-import-modules": "^2.1.0"
+    "sass-import-modules": "^2.1.0",
+    "vulcanize": "^1.15.4"
   },
   "dependencies": {
     "body-parser": "^1.15.2",

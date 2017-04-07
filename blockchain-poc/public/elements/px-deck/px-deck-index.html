@@ -1,10 +1,10 @@
-<link rel="import" href="../../bower_components/px-sample-cards/blank-card.html">
+<link rel="import" href="/bower_components/px-sample-cards/blank-card.html">
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="px-deck.html">
 
 <dom-module id="px-deck-index">
 
-  <template>
+    <template>
 
     <iron-ajax
       id="deckIronAjax"
@@ -17,82 +17,86 @@
       <px-deck id="[[item.id]]" deck-data="[[item.deckData]]"></px-deck>
     </template>
 
-  </template>
+    </template>
 
-  <!-- include lodash utility library -->
-  <script src="/bower_components/lodash/dist/lodash.min.js"></script>
+    <!-- include lodash utility library -->
+    <script src="/bower_components/lodash/dist/lodash.min.js"></script>
 
-  <script>
-    Polymer({
+    <script>
+        Polymer({
 
-      is: 'px-deck-index',
+            is: 'px-deck-index',
 
-      properties: {
-        deckId: {
-          type: String
-        },
-        // returned from iron-ajax request
-        _deckData: {
-          type: Object,
-          value: function() { return {}; }
-          // observer: '_refreshFilter'  // moved inside _updateDecks
-        },
-        viewServiceBaseUrl: {
-          type: String,
-          value: '/api/view-service/' // default
-        },
-        // updated when deckId is changed
-        _deckUrl: {
-          type: String,
-          computed: '_computeDeckUrl(deckId)'
-        },
-        _decks: {
-          type: Array,
-          value: function() { return []; }
-        }
-      },
+            properties: {
+                deckId: {
+                    type: String
+                },
+                // returned from iron-ajax request
+                _deckData: {
+                    type: Object,
+                    value: function() {
+                            return {};
+                        }
+                        // observer: '_refreshFilter'  // moved inside _updateDecks
+                },
+                viewServiceBaseUrl: {
+                    type: String,
+                    value: '/api/view-service/' // default
+                },
+                // updated when deckId is changed
+                _deckUrl: {
+                    type: String,
+                    computed: '_computeDeckUrl(deckId)'
+                },
+                _decks: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
 
-      observers: [
-        '_updateDecks(_deckData)'
-      ],
+            observers: [
+                '_updateDecks(_deckData)'
+            ],
 
-      _computeDeckUrl: function() {
-        return this.viewServiceBaseUrl + 'decks/' + this.deckId;
-      },
+            _computeDeckUrl: function() {
+                return this.viewServiceBaseUrl + 'decks/' + this.deckId;
+            },
 
-      _deckIsVisible: function(deckId) {
-        return this.deckId === deckId;
-      },
+            _deckIsVisible: function(deckId) {
+                return this.deckId === deckId;
+            },
 
-      _filterDecks: function(deck) {
-        return this._deckIsVisible(deck.id);
-      },
+            _filterDecks: function(deck) {
+                return this._deckIsVisible(deck.id);
+            },
 
-      _refreshFilter: function() {
-        this.$.decks.render();
-      },
+            _refreshFilter: function() {
+                this.$.decks.render();
+            },
 
-      // called when _deckData changes
-      _updateDecks: function() {
-        if (!this._decks) {  // don't think this is needed, since we have a default value.
-          this.set('_decks', []);
-        }
-        // find existing deck
-        var that = this;
-        var index = _.findIndex(this._decks, function(o) {
-          return o.id === that.deckId
+            // called when _deckData changes
+            _updateDecks: function() {
+                if (!this._decks) { // don't think this is needed, since we have a default value.
+                    this.set('_decks', []);
+                }
+                // find existing deck
+                var that = this;
+                var index = _.findIndex(this._decks, function(o) {
+                    return o.id === that.deckId
+                });
+                if (index === -1 && this.deckId) {
+                    // deck is new
+                    this.push('_decks', {
+                        id: this.deckId,
+                        deckData: this._deckData
+                    });
+                }
+                this._refreshFilter();
+            }
+
         });
-        if(index === -1 && this.deckId) {
-          // deck is new
-          this.push('_decks', {
-            id: this.deckId,
-            deckData: this._deckData
-          });
-        }
-        this._refreshFilter();
-      }
-
-    });
-  </script>
+    </script>
 
 </dom-module>
